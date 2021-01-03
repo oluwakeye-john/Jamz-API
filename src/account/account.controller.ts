@@ -5,8 +5,11 @@ import {
   HttpStatus,
   Post,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { Role } from 'src/role.decorator';
+import { RoleGuard } from 'src/role.guard';
 import { AccountService } from './account.service';
 import { LoginDTO } from './dto/login.dto';
 import { RegisterDTO } from './dto/register.dto';
@@ -26,6 +29,8 @@ export class AccountController {
   }
 
   @Post('register')
+  @UseGuards(RoleGuard)
+  @Role('admin')
   @HttpCode(HttpStatus.CREATED)
   register(@Body() registerDTO: RegisterDTO) {
     return this.accountService.register(registerDTO);

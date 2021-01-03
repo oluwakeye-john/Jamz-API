@@ -11,10 +11,10 @@ export class AuthMiddleware implements NestMiddleware {
     const accessToken = req.signedCookies?.['access-token'];
     if (accessToken) {
       req.user = accessToken;
-      next();
     } else {
       req.user = false;
-      throw new UnauthorizedException();
+      // throw new UnauthorizedException();
     }
+    next();
   }
 }
