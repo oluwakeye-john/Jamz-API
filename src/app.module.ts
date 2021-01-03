@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import config from './config';
 import { configValidation } from './config/validation';
+import { AccountModule } from './account/account.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { configValidation } from './config/validation';
         allowUnknown: true,
       },
     }),
+    AccountModule,
   ],
   controllers: [AppController],
   providers: [AppService],
