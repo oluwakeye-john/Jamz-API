@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ResponseHandler } from 'src/response';
 import { LoginDTO } from './dto/login.dto';
 import { RegisterDTO } from './dto/register.dto';
 import { User, UserDocument } from './schemas/User.schema';
@@ -18,7 +17,7 @@ export class AccountService {
   constructor(@InjectModel(User.name) private user: Model<UserDocument>) {}
   private readonly logger = new Logger(AccountService.name);
 
-  async login(data: LoginDTO): Promise<ResponseHandler> {
+  async login(data: LoginDTO): Promise<any> {
     const user = await this.user
       .findOne({ email: data.email })
       .select(['password']);
@@ -30,13 +29,13 @@ export class AccountService {
       );
 
       if (isPasswordValid) {
-        return { msg: 'Login Successful', data: {} };
+        return 'Login Successful';
       }
     }
     throw new UnauthorizedException('Invalid credentials');
   }
 
-  async register(data: RegisterDTO): Promise<ResponseHandler> {
+  async register(data: RegisterDTO): Promise<any> {
     try {
       const hashed = await hashPassword(data.password);
       const newUser = new this.user({ ...data, password: hashed });
