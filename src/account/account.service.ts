@@ -19,4 +19,8 @@ export class AccountService {
     this.logger.log(data);
     return 'Account created';
   }
+
+  async me(id: string) {
+    return await this.user.findOne({ _id: id });
+  }
 }
