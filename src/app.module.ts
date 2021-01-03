@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import config from './config';
 import { configValidation } from './config/validation';
 import { AccountModule } from './account/account.module';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { AccountModule } from './account/account.module';
         allowUnknown: true,
       },
     }),
+    MongooseModule.forRoot(process.env.DATABASE_URL),
     AccountModule,
   ],
   controllers: [AppController],
