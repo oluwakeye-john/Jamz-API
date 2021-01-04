@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Res,
-  UseInterceptors,
-} from '@nestjs/common';
-import { Response } from 'express';
-import { AccessToken } from 'src/main.interface';
+import { Body, Controller, Get, Post, UseInterceptors } from '@nestjs/common';
 import { ResponseInterceptor } from 'src/response.interceptor';
 import { AccountService } from './account.service';
 import { LoginDTO } from './dto/login.dto';
@@ -20,17 +11,19 @@ export class AccountController {
 
   @Post('login')
   async login(@Body() loginDTO: LoginDTO) {
-    const resp = await this.accountService.login(loginDTO);
-    return resp;
+    const data = await this.accountService.login(loginDTO);
+    return data;
   }
 
   @Post('register')
-  async register(
-    @Body() registerDTO: RegisterDTO,
-    @Res({ passthrough: true }) response: Response,
-  ) {
-    const resp = await this.accountService.register(registerDTO);
-    response.cookie(AccessToken, '');
-    return resp;
+  async register(@Body() registerDTO: RegisterDTO) {
+    const data = await this.accountService.register(registerDTO);
+    return data;
+  }
+
+  @Get('me')
+  async me() {
+    const data = await this.accountService.me('12');
+    return data;
   }
 }

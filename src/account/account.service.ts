@@ -7,17 +7,30 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { AccessToken, RefreshToken } from 'src/main.interface';
 import { LoginDTO } from './dto/login.dto';
 import { RegisterDTO } from './dto/register.dto';
 import { User, UserDocument } from './schemas/User.schema';
-import { comparePassword, hashPassword } from './utils/index.utils';
+import {
+  comparePassword,
+  generateAccessToken,
+  generateRefreshToken,
+  hashPassword,
+} from './utils/index.utils';
 
+export interface AuthResponse {
+  tokens: {
+    [AccessToken]: string;
+    [RefreshToken]: string;
+  };
+  message?: string;
+}
 @Injectable()
 export class AccountService {
   constructor(@InjectModel(User.name) private user: Model<UserDocument>) {}
   private readonly logger = new Logger(AccountService.name);
 
-  async login(data: LoginDTO): Promise<any> {
+  async login(data: LoginDTO): Promise<AuthResponse> {
     const user = await this.user
       .findOne({ email: data.email })
       .select(['password']);
@@ -29,28 +42,53 @@ export class AccountService {
       );
 
       if (isPasswordValid) {
-        return 'Login Successful';
+        const accessToken = generateAccessToken(user._id);
+        const refreshToken = generateRefreshToken(user._id);
+
+        return {
+          tokens: {
+            'access-token': accessToken,
+            'refresh-token': refreshToken,
+          },
+          message: 'Login successful',
+        };
       }
     }
     throw new UnauthorizedException('Invalid credentials');
   }
 
-  async register(data: RegisterDTO): Promise<any> {
+  async register(data: RegisterDTO): Promise<AuthResponse> {
     try {
       const hashed = await hashPassword(data.password);
       const newUser = new this.user({ ...data, password: hashed });
       await newUser.save();
-      return { msg: 'Account created' };
+
+      const accessToken = generateAccessToken(newUser._id);
+      const refreshToken = generateRefreshToken(newUser._id);
+
+      return {
+        tokens: {
+          'access-token': accessToken,
+          'refresh-token': refreshToken,
+        },
+        message: 'Account created',
+      };
     } catch (err) {
       if (11000 === err.code || 11001 === err.code) {
         throw new ConflictException('Account already exist');
       } else {
+        this.logger.error(err);
         throw new BadRequestException('An error occurred');
       }
     }
   }
 
   async me(id: string) {
-    return await this.user.findOne({ _id: id });
+    try {
+      return await this.user.findOne({ _id: id });
+    } catch (err) {
+      this.logger.log(err);
+      throw new BadRequestException('Invalid user');
+    }
   }
 }
