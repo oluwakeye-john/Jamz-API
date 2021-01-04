@@ -13,9 +13,7 @@ export class AuthMiddleware implements NestMiddleware {
     if (accessToken) {
       const token: any = verifyAccessToken(accessToken);
       req.user = token.id;
-      next();
-    } else {
-      req.user = false;
+      return next();
     }
     throw new UnauthorizedException();
   }

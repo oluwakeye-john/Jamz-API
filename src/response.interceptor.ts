@@ -7,7 +7,12 @@ import {
 import { Response } from 'express';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AccessToken, RefreshToken } from './main.interface';
+import {
+  AccessToken,
+  AccessTokenMaxAge,
+  RefreshToken,
+  RefreshTokenMaxAge,
+} from './main.interface';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
@@ -22,10 +27,16 @@ export class ResponseInterceptor implements NestInterceptor {
             const accessToken = data.tokens?.[AccessToken];
             const refreshToken = data.tokens?.[RefreshToken];
             if (accessToken) {
-              response.cookie(AccessToken, accessToken, { signed: true });
+              response.cookie(AccessToken, accessToken, {
+                signed: true,
+                maxAge: AccessTokenMaxAge,
+              });
             }
             if (refreshToken) {
-              response.cookie(RefreshToken, refreshToken, { signed: true });
+              response.cookie(RefreshToken, refreshToken, {
+                signed: true,
+                maxAge: RefreshTokenMaxAge,
+              });
             }
           }
           return payload;

@@ -10,7 +10,7 @@ import { Model } from 'mongoose';
 import { AccessToken, RefreshToken } from 'src/main.interface';
 import { LoginDTO } from './dto/login.dto';
 import { RegisterDTO } from './dto/register.dto';
-import { User, UserDocument } from './schemas/User.schema';
+import { User } from './schemas/User.schema';
 import {
   comparePassword,
   generateAccessToken,
@@ -27,7 +27,7 @@ export interface AuthResponse {
 }
 @Injectable()
 export class AccountService {
-  constructor(@InjectModel(User.name) private user: Model<UserDocument>) {}
+  constructor(@InjectModel(User.name) private user: Model<User>) {}
   private readonly logger = new Logger(AccountService.name);
 
   async login(data: LoginDTO): Promise<AuthResponse> {
@@ -85,7 +85,8 @@ export class AccountService {
 
   async me(id: string) {
     try {
-      return await this.user.findOne({ _id: id });
+      const user = await this.user.findOne({ _id: id }).lean();
+      return user;
     } catch (err) {
       this.logger.log(err);
       throw new BadRequestException('Invalid user');
