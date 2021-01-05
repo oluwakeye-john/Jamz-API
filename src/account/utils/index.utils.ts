@@ -2,6 +2,7 @@ import * as bcrypt from 'bcrypt';
 import { UserRole } from '../interfaces/user.interface';
 import * as jwt from 'jsonwebtoken';
 import config from 'src/config';
+import { AccessTokenMaxAge, RefreshTokenMaxAge } from 'src/main.interface';
 
 export const hashPassword = async (password: string) => {
   return await bcrypt.hash(password, 10);
@@ -16,12 +17,14 @@ export const generateAccessToken = (
   role: UserRole = UserRole.REGULAR,
 ) => {
   return jwt.sign({ id, role }, config().keys.ACCESS_KEY, {
-    expiresIn: 60 * 60 * 5,
+    expiresIn: AccessTokenMaxAge / 1000,
   });
 };
 
 export const generateRefreshToken = (id: string) => {
-  return jwt.sign({ id }, config().keys.REFRESH_KEY, { expiresIn: '30d' });
+  return jwt.sign({ id }, config().keys.REFRESH_KEY, {
+    expiresIn: RefreshTokenMaxAge / 1000,
+  });
 };
 
 export const verifyJWT = (token: string, key: string): any | boolean => {

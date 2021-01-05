@@ -13,6 +13,7 @@ import { AccountModule } from './account/account.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AccountController } from './account/account.controller';
 import { AuthMiddleware } from './auth.middleware';
+import { SongModule } from './song/song.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { AuthMiddleware } from './auth.middleware';
     }),
     MongooseModule.forRoot(process.env.DATABASE_URL),
     AccountModule,
+    SongModule,
   ],
   controllers: [AppController],
   providers: [AppService],

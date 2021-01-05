@@ -20,12 +20,13 @@ export class ResponseInterceptor implements NestInterceptor {
     const response: Response = context.switchToHttp().getResponse();
 
     return next.handle().pipe(
-      map((data) => {
+      map((_data) => {
+        const data = _data || {};
         if (typeof data === 'object') {
           const { tokens, ...payload } = data;
           if (tokens) {
-            const accessToken = data.tokens?.[AccessToken];
-            const refreshToken = data.tokens?.[RefreshToken];
+            const accessToken = data?.tokens?.[AccessToken];
+            const refreshToken = data?.tokens?.[RefreshToken];
             if (accessToken) {
               response.cookie(AccessToken, accessToken, {
                 signed: true,
