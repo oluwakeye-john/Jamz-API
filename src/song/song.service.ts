@@ -37,9 +37,6 @@ export class SongService {
   }
 
   async findById(id: string): Promise<any> {
-    if (!id) {
-      throw new BadRequestException(SongErrors.ID_REQUIRED);
-    }
     try {
       const resp = await this.song.findById(id).lean();
       if (!resp?._id) {
@@ -53,14 +50,10 @@ export class SongService {
   }
 
   async update(id: string, updateSongDto: UpdateSongDto) {
-    if (!id) {
-      throw new BadRequestException(SongErrors.ID_REQUIRED);
-    }
     try {
       await this.song.findByIdAndUpdate(id, updateSongDto, {
         new: true,
       });
-
       return 'Song updated';
     } catch (err) {
       this.logger.error(err);

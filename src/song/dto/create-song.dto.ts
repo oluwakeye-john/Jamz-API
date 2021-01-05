@@ -1,13 +1,29 @@
-import { IsNotEmpty, IsOptional, IsUrl } from 'class-validator';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+} from 'class-validator';
 
 export class CreateSongDto {
   @IsNotEmpty()
   name: string;
 
+  @IsString()
+  @IsOptional()
   albumId?: string;
-  categoryId?: string;
+
+  @IsString()
+  @IsOptional()
   artistId?: string;
+
+  @IsString()
+  @IsOptional()
   genreId?: string;
+
+  @IsBoolean()
+  @IsOptional()
   hidden?: boolean;
 
   @IsUrl()
