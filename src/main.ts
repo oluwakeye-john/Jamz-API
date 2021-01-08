@@ -9,10 +9,12 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   app.useGlobalPipes(new ValidationPipe());
-  app.enableCors({
-    origin:
-      configService.get('PORT') === 'production' ? origins.prod : origins.dev,
-  });
+  app.enableCors();
+
+  // {
+  //   origin:
+  //     configService.get('PORT') === 'production' ? origins.prod : origins.dev,
+  // }
 
   app.use(cookieParser('mysecret'));
 

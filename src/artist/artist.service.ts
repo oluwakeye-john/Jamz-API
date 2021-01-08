@@ -34,7 +34,7 @@ export class ArtistService {
 
   async findAll() {
     try {
-      return await this.artist.find();
+      return await this.artist.find().sort('-createdAt');
     } catch (err) {
       this.logger.error(err);
       throw new NotFoundException(ArtistErrors.ERROR_FETCHING_ARTIST);

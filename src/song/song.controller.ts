@@ -27,7 +27,6 @@ export class SongController {
   }
 
   @Get()
-  @HttpCode(HttpStatus.OK)
   findAll() {
     return this.songService.findAll();
   }
@@ -40,6 +39,11 @@ export class SongController {
   @Put(':id')
   update(@Param('id') id: string, @Body() updateSongDto: UpdateSongDto) {
     return this.songService.update(id, updateSongDto);
+  }
+
+  @Get('search/:q')
+  search() {
+    return [];
   }
 
   @Delete(':id')

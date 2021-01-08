@@ -22,25 +22,27 @@ export class ResponseInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((_data) => {
         const data = _data || {};
+        console.log('type', typeof data);
         if (typeof data === 'object') {
-          const { tokens, ...payload } = data;
-          if (tokens) {
-            const accessToken = data?.tokens?.[AccessToken];
-            const refreshToken = data?.tokens?.[RefreshToken];
-            if (accessToken) {
-              response.cookie(AccessToken, accessToken, {
-                signed: true,
-                maxAge: AccessTokenMaxAge,
-              });
-            }
-            if (refreshToken) {
-              response.cookie(RefreshToken, refreshToken, {
-                signed: true,
-                maxAge: RefreshTokenMaxAge,
-              });
-            }
-          }
-          return payload;
+          // const { tokens, ...payload } = data;
+          // console.log('payload', payload);
+          // if (tokens) {
+          //   const accessToken = data?.tokens?.[AccessToken];
+          //   const refreshToken = data?.tokens?.[RefreshToken];
+          //   if (accessToken) {
+          //     response.cookie(AccessToken, accessToken, {
+          //       signed: true,
+          //       maxAge: AccessTokenMaxAge,
+          //     });
+          //   }
+          //   if (refreshToken) {
+          //     response.cookie(RefreshToken, refreshToken, {
+          //       signed: true,
+          //       maxAge: RefreshTokenMaxAge,
+          //     });
+          //   }
+          // }
+          return data;
         } else {
           return { message: data };
         }
