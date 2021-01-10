@@ -42,8 +42,9 @@ export class SongController {
   }
 
   @Get('search/:q')
-  search() {
-    return [];
+  search(@Param('q') q: string) {
+    console.log('q', q);
+    return this.songService.search(q);
   }
 
   @Delete(':id')

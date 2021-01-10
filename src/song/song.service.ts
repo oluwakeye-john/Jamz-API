@@ -40,6 +40,15 @@ export class SongService {
     }
   }
 
+  async search(q: string): Promise<Song[]> {
+    try {
+      return await this.song.find({ name: { $regex: q, $options: 'i' } });
+    } catch (err) {
+      this.logger.error(err);
+      throw new NotFoundException(SongErrors.ERROR_FETCHING_SONG);
+    }
+  }
+
   async findById(id: string): Promise<any> {
     try {
       const resp = await this.song.findById(id).lean();

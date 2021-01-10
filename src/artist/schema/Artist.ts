@@ -6,7 +6,10 @@ export class Artist extends Document {
   @Prop({ required: true })
   name: string;
 
-  @Prop()
+  @Prop({
+    default:
+      'https://res.cloudinary.com/johnprops/image/upload/v1605560906/placeholder_wt9snh.png',
+  })
   imageUrl?: string;
 
   @Prop({ default: '' })
