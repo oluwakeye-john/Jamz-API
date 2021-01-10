@@ -8,6 +8,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ResponseInterceptor } from 'src/response.interceptor';
+import { Song } from 'src/song/schema/Song';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { ArtistErrors } from './error-messages';
@@ -18,6 +19,7 @@ import { Artist } from './schema/Artist';
 export class ArtistService {
   constructor(
     @InjectModel(Artist.name) private readonly artist: Model<Artist>,
+    @InjectModel(Song.name) private readonly song: Model<Artist>,
   ) {}
   private readonly logger = new Logger(ArtistService.name);
 
@@ -48,6 +50,21 @@ export class ArtistService {
         throw new BadRequestException(ArtistErrors.ERROR_FETCHING_ARTIST);
       }
       return resp;
+    } catch (err) {
+      this.logger.error(err);
+      throw new NotFoundException(ArtistErrors.ERROR_FETCHING_ARTIST);
+    }
+  }
+
+  async findSongByArtist(id: string): Promise<any> {
+    try {
+      const artist = await this.artist.findById(id).lean();
+      if (artist && artist.name) {
+        const songs = await this.song.find({ artistId: id });
+        return { ...artist, songs };
+      } else {
+        throw new NotFoundException(ArtistErrors.ERROR_FETCHING_ARTIST);
+      }
     } catch (err) {
       this.logger.error(err);
       throw new NotFoundException(ArtistErrors.ERROR_FETCHING_ARTIST);

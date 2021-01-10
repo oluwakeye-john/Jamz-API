@@ -3,12 +3,12 @@ import {
   Get,
   Post,
   Body,
-  Put,
   Param,
   Delete,
   UseInterceptors,
   HttpCode,
   HttpStatus,
+  Patch,
 } from '@nestjs/common';
 import { SongService } from './song.service';
 import { CreateSongDto } from './dto/create-song.dto';
@@ -36,14 +36,13 @@ export class SongController {
     return this.songService.findById(id);
   }
 
-  @Put(':id')
+  @Patch(':id')
   update(@Param('id') id: string, @Body() updateSongDto: UpdateSongDto) {
     return this.songService.update(id, updateSongDto);
   }
 
   @Get('search/:q')
   search(@Param('q') q: string) {
-    console.log('q', q);
     return this.songService.search(q);
   }
 
