@@ -6,7 +6,10 @@ export class Song extends Document {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ default: '' })
+  @Prop({
+    default:
+      'https://res.cloudinary.com/johnprops/image/upload/v1610365743/album-placeholder_gblrxp.png',
+  })
   imageUrl: string;
 
   @Prop({ required: true })

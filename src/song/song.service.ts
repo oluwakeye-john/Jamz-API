@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Artist } from 'src/artist/schema/Artist';
 import { ResponseInterceptor } from 'src/response.interceptor';
 import { CreateSongDto } from './dto/create-song.dto';
 import { UpdateSongDto } from './dto/update-song.dto';
@@ -16,7 +17,10 @@ import { Song } from './schema/Song';
 @Injectable()
 @UseInterceptors(ResponseInterceptor)
 export class SongService {
-  constructor(@InjectModel(Song.name) private readonly song: Model<Song>) {}
+  constructor(
+    @InjectModel(Song.name) private readonly song: Model<Song>,
+    @InjectModel(Artist.name) private readonly artist: Model<Artist>,
+  ) {}
 
   private readonly logger = new Logger(SongService.name);
 
@@ -35,6 +39,7 @@ export class SongService {
     try {
       return await this.song.find().sort('-createdAt');
     } catch (err) {
+      console.log(err);
       this.logger.error(err);
       throw new NotFoundException(SongErrors.ERROR_FETCHING_SONG);
     }
