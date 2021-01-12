@@ -35,8 +35,28 @@ export class ArtistService {
   }
 
   async findAll() {
+    console.log('here');
     try {
-      return await this.artist.find().sort('-createdAt');
+      const resp = await this.artist.aggregate([
+        {
+          $addFields: { id: { $toString: '$_id' } },
+        },
+        {
+          $lookup: {
+            from: 'songs',
+            localField: 'id',
+            foreignField: 'artistId',
+            as: 'songs',
+          },
+        },
+        {
+          $unset: 'id',
+        },
+        {
+          $sort: { createdAt: -1 },
+        },
+      ]);
+      return resp;
     } catch (err) {
       this.logger.error(err);
       throw new NotFoundException(ArtistErrors.ERROR_FETCHING_ARTIST);
@@ -45,12 +65,13 @@ export class ArtistService {
 
   async findOne(id: string) {
     try {
-      const resp = await this.artist.findById(id).lean();
+      const resp = await this.song.findById(id).lean();
       if (!resp?._id) {
         throw new BadRequestException(ArtistErrors.ERROR_FETCHING_ARTIST);
       }
       return resp;
     } catch (err) {
+      console.log(err);
       this.logger.error(err);
       throw new NotFoundException(ArtistErrors.ERROR_FETCHING_ARTIST);
     }
@@ -60,7 +81,40 @@ export class ArtistService {
     try {
       const artist = await this.artist.findById(id).lean();
       if (artist && artist.name) {
-        const songs = await this.song.find({ artistId: id });
+        const songs = await this.song.aggregate([
+          {
+            $match: {
+              $expr: {
+                $eq: [id, { $toString: '$artistId' }],
+              },
+            },
+          },
+          {
+            $lookup: {
+              from: 'artists',
+              let: { artistId: '$artistId' },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $eq: [{ $toString: '$_id' }, '$$artistId'],
+                    },
+                  },
+                },
+              ],
+              as: 'artist',
+            },
+          },
+          {
+            $unset: 'id',
+          },
+          {
+            $addFields: { artist: { $arrayElemAt: ['$artist', 0] } },
+          },
+          {
+            $sort: { createdAt: -1 },
+          },
+        ]);
         return { ...artist, songs };
       } else {
         throw new NotFoundException(ArtistErrors.ERROR_FETCHING_ARTIST);

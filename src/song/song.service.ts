@@ -37,7 +37,48 @@ export class SongService {
 
   async findAll() {
     try {
-      return await this.song.find().sort('-createdAt');
+      // return await this.song.find().sort('-createdAt');
+      // const resp = await this.song.aggregate([
+      //   {
+      //     $lookup: {
+      //       from: 'artists',
+      //       let: { artistId: '$artistId' },
+      //       pipeline: [
+      //         {
+      //           $match: {
+      //             $expr: { $eq: [{ $toString: '$_id' }, '$$artistId'] },
+      //           },
+      //         },
+      //       ],
+      //       as: 'songs',
+      //     },
+      //   },
+      // ]);
+      const resp = await this.song.aggregate([
+        {
+          $lookup: {
+            from: 'artists',
+            let: { artistId: '$artistId' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $eq: [{ $toString: '$_id' }, '$$artistId'],
+                  },
+                },
+              },
+            ],
+            as: 'artist',
+          },
+        },
+        {
+          $addFields: { artist: { $arrayElemAt: ['$artist', 0] } },
+        },
+        {
+          $sort: { createdAt: -1 },
+        },
+      ]);
+      return resp;
     } catch (err) {
       console.log(err);
       this.logger.error(err);
